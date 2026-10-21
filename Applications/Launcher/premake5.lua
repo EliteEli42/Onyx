@@ -24,12 +24,16 @@ project(name)
     externalincludedirs {
         path.join(SolutionRoot, "Vendor/glad/include"),
         path.join(SolutionRoot, "Vendor/glfw/include"),
-        path.join(SolutionRoot, "Vendor/glm/include")
+        path.join(SolutionRoot, "Vendor/glm/include"),
+
+        path.join(SolutionRoot, "Core/include")
     }
     
     links { 
         "glad",
-        "glfw"
+        "glfw",
+
+        "Core"
     }                       
 
     vpaths {
