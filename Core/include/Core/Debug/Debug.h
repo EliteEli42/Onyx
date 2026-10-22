@@ -37,7 +37,7 @@
     #include <Windows.h>
 
     #define SHOW_FATAL_MESSAGE_BOX(msg)                                     \
-            MessageBoxA(nullptr, (msg).c_str(), "Fatal Error",                  \
+            MessageBoxA(nullptr, (msg).c_str(), "Fatal Error",              \
                         MB_OK | MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND)
 
 #else

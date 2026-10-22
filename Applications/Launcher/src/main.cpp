@@ -4,22 +4,22 @@
 using namespace Core;
 
 int main() {
-	Log::SetLevel(LogLevel::Trace);
+    Log::SetLevel(LogLevel::Trace);
 
-	Log::Trace("This is a trace message.");
-	Log::Debug("This is a debug message.");
-	Log::Info("This is an info message.");
-	Log::Warn("This is a warning message.");
-	Log::Error("This is an error message.");
-	Log::Fatal("This is a fatal message.");
+    Log::Trace("This is a trace message.");
+    Log::Debug("This is a debug message.");
+    Log::Info("This is an info message.");
+    Log::Warn("This is a warning message.");
+    Log::Error("This is an error message.");
+    Log::Fatal("This is a fatal message.");
 
-	DEBUG_BREAK();
+    DEBUG_BREAK();
 
-	CHECK(false, "This is a check failure.");
+    CHECK(false, "This is a check failure.");
 
-	VERIFY(false, "This is a verify failure.", -1);
+    VERIFY(false, "This is a verify failure.", -1);
 
-	ASSERT(false, "This is an assertion failure.");
+    ASSERT(false, "This is an assertion failure.");
 
-	return 0;
+    return 0;
 }

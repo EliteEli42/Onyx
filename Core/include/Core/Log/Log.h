@@ -3,11 +3,9 @@
 #include <string>
 #include <source_location>
 #include <mutex>
-#include <queue>
 #include <chrono>
 
 namespace Core {
-
     enum class LogLevel
     {
         Trace,
@@ -27,16 +25,11 @@ namespace Core {
         std::chrono::system_clock::time_point timestamp;
     };
 
-    class Log
-    {
-    public:
-
-
+    class Log {
     public:
         inline static void SetLevel(LogLevel level) { sCurrentLevel = level; }
         inline static void EnableTimeStamp(bool enable) { sTimeStamp = enable; }
         inline static void EnableSourceLocation(bool enable) { sSourceLocation = enable; }
-        inline static void SetLogFile(const std::string& filePath) { sLogFilePath = filePath; }
 
         inline static void Trace(const std::string& msg,
             std::source_location loc = std::source_location::current())
@@ -85,10 +78,6 @@ namespace Core {
         inline static bool sTimeStamp = true;
         inline static bool sSourceLocation = true;
         inline static std::mutex sMutex;
-
-        inline static std::string sLogFilePath = "";
-
-        inline static std::queue<LogEntry> sLogQueue;
     };
 
 } // namespace Core
