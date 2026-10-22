@@ -44,7 +44,7 @@ workspace "Onyx"
     filter "toolset:msc*"
         conformancemode "On"
         multiprocessorcompile "On"
-        buildoptions { "/utf-8" }
+        buildoptions { "/utf-8","/Zc:preprocessor" }
         externalwarnings "Off"
 
         staticruntime "On"

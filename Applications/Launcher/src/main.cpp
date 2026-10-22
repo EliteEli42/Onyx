@@ -17,6 +17,8 @@ int main() {
 
 	CHECK(false, "This is a check failure.");
 
+	VERIFY(false, "This is a verify failure.", -1);
+
 	ASSERT(false, "This is an assertion failure.");
 
 	return 0;
