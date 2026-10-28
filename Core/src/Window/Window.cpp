@@ -1,6 +1,7 @@
 #include <Core/Window/Window.h>
 #include <Core/Common/Log.h>
 #include <Core/Common/Debug.h>
+#include <Core/Common/ScopeGuard.h>
 
 #include <stb/stb_image.h>
 #include <stb/stb_image_write.h>
@@ -52,7 +53,7 @@ namespace Core {
     class WindowCallback {
     public:
         static void Error(int error, const char* description) {
-            Log::Error(std::string("GLFW Error: ") + std::to_string(error) + " " + description);
+            Log::Error("GLFW Error: {} {}", error, description);
         }
 
         // GLFW to Key mapping
@@ -305,9 +306,9 @@ namespace Core {
         static bool Init() {
             if (sWindowCount == 0) {
 
-#ifndef NDEBUG
+#if defined(DEBUG)
                 glfwSetErrorCallback(WindowCallback::Error);
-#endif // NDEBUG
+#endif // DEBUG
 
 #if defined(_WIN32)
                 timeBeginPeriod(1);
@@ -315,6 +316,7 @@ namespace Core {
                 if (!glfwInit()) {
                     return false; // Failed to initialize
                 }
+                Log::Info("GLFW initialized ({})", glfwGetVersionString());
                 initializied = true;
             }
             sWindowCount++;
@@ -329,6 +331,7 @@ namespace Core {
 #endif
 
                 glfwTerminate();
+                Log::Info("GLFW terminated.");
                 initializied = false;
             }
         }
@@ -371,17 +374,22 @@ namespace Core {
         return bestMonitor;
     }
 
+#define REQUIRE_HANDLE(ret) \
+    VERIFY_RETURN(mHandle, ret, "{}: Window has not been created.", __func__)
+
     Window::~Window() {
         Destroy();
     }
 
     bool Window::Create(const WindowDesc& desc) {
 
-        VERIFY(mHandle == nullptr, "Window already created.", false);
+        VERIFY_RETURN(mHandle == nullptr, false, "Window already created.");
 
         bool firstWindow = !GLFWContext::IsInitializied();
 
-        VERIFY(GLFWContext::Init(), "Failed to initialize GLFW.", false);
+        VERIFY_RETURN(GLFWContext::Init(), false, "Failed to initialize GLFW.");
+
+        ScopeGuard cleanup([&] { Destroy(); });
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -412,6 +420,12 @@ namespace Core {
 #endif
         mHandle = glfwCreateWindow(desc.width, desc.height, desc.title, nullptr, desc.sharedContext ? desc.sharedContext->mHandle : nullptr);
 
+        const char* err = nullptr;
+        glfwGetError(&err);
+        VERIFY_RETURN(mHandle, false, "Failed to create GLFW window: {}", err ? err : "unknown");
+
+        Log::Info("Window '{}' created ({}x{})", desc.title, mSize.x, mSize.y);
+
         mCreated = true;
 
         mLastFrameTime = glfwGetTime();
@@ -428,19 +442,11 @@ namespace Core {
         SetActive();
 
         if (firstWindow) {
-            if (!gladLoadGL(glfwGetProcAddress)) {
-                VERIFY(false, "Failed to load glad");
-                Destroy();
-            }
+            VERIFY_RETURN(gladLoadGL(glfwGetProcAddress), false, "Failed to load glad");
         }
 
-        if (!mHandle) {
-            VERIFY(false, "Failed to create GLFW window.");
-            mCreated = false;
-            mHandle = nullptr;
-            GLFWContext::Shutdown();
-            return false;
-        }
+        Log::Info("OpenGL {}",(const char*)glGetString(GL_VERSION));
+        Log::Info("{} / {}", (const char*)glGetString(GL_VENDOR), (const char*)glGetString(GL_RENDERER));
 
         glfwSetWindowAttrib(mHandle, GLFW_RESIZABLE, desc.resizeable);
 
@@ -461,16 +467,17 @@ namespace Core {
         glfwSetWindowSize(mHandle, mSize.x, mSize.y + 1);
         glfwSetWindowSize(mHandle, mSize.x, mSize.y);
 
+        cleanup.Dismiss();
         return true;
     }
 
     void Window::Destroy() {
-        if (!mHandle) return;
-
         if (mHandle) glfwDestroyWindow(mHandle);
         mHandle = nullptr;
 
         mCreated = false;
+
+        Log::Info("Window destroyed.");
 
         GLFWContext::Shutdown();
     }
@@ -481,6 +488,7 @@ namespace Core {
     }
 
     void Window::SwapBuffers() {
+        REQUIRE_HANDLE(void());
         if (mTargetFPS > 0.0) {
             double now = glfwGetTime();
             double elapsed = now - mLastFrameTime;
@@ -522,37 +530,38 @@ namespace Core {
 
     bool Window::ShouldClose() const
     {
+        REQUIRE_HANDLE(true);
         return mShouldClose || glfwWindowShouldClose(mHandle);
     }
 
     void Window::SetActive(bool active)
     {
-        if (!mHandle) {
-            CHECK(false, "Attempted to set active on a window that hasn't been created.");
-            return;
-        }
-
+        REQUIRE_HANDLE(void());
         if (active) glfwMakeContextCurrent(mHandle);
         else glfwMakeContextCurrent(nullptr);
     }
 
     void Window::Maximize()
     {
+        REQUIRE_HANDLE(void());
         glfwMaximizeWindow(mHandle);
     }
 
     bool Window::IsMaximized() const
     {
+        REQUIRE_HANDLE(false);
         return glfwGetWindowAttrib(mHandle, GLFW_MAXIMIZED) == GLFW_TRUE;
     }
 
     void Window::Minimize()
     {
+        REQUIRE_HANDLE(void());
         glfwIconifyWindow(mHandle);
     }
 
     void Window::Restore()
     {
+        REQUIRE_HANDLE(void());
         if (mIsFullscreen) {
             SetFullscreen(false);
         }
@@ -561,34 +570,34 @@ namespace Core {
     }
 
     void Window::Hide() {
+        REQUIRE_HANDLE(void());
         glfwHideWindow(mHandle);
     }
 
     void Window::Show() {
+        REQUIRE_HANDLE(void());
         glfwShowWindow(mHandle);
     }
 
     bool Window::SetIcon(Image& image)
     {
-        if (image.GetNrChannels() != 4) return false;
-        if (image.GetLayerCount() < 1) return false;
+        REQUIRE_HANDLE(false);
+        VERIFY_RETURN(image.GetNrChannels() == 4, false, "SetIcon: icon must have 4 channels (RGBA), got {}.", image.GetNrChannels());
+        VERIFY_RETURN(image.GetLayerCount() >= 1, false, "SetIcon: image has no layers.");
 
         GLFWimage icon{};
-
         icon.pixels = image.GetLayer(0);
-
-        icon.height = image.GetHeight();
         icon.width = image.GetWidth();
+        icon.height = image.GetHeight();
 
-        if (icon.pixels) {
-            glfwSetWindowIcon(mHandle, 1, &icon);
-            return true;
-        }
+        VERIFY_RETURN(icon.pixels, false, "SetIcon: image layer 0 has no pixel data.");
 
-        return false;
+        glfwSetWindowIcon(mHandle, 1, &icon);
+        return true;
     }
 
     void Window::SetFullscreen(bool enabled) {
+        REQUIRE_HANDLE(void());
         if (enabled == mIsFullscreen) return;
         GLFWwindow* win = mHandle;
         GLFWmonitor* monitor = GetCurrentMonitor(win);
@@ -620,15 +629,18 @@ namespace Core {
 
     void Window::SetPosition(IVec2 pos)
     {
+        REQUIRE_HANDLE(void());
         glfwSetWindowPos(mHandle, pos.x, pos.y);
     }
 
     void Window::SetSize(IVec2 pos)
     {
+        REQUIRE_HANDLE(void());
         glfwSetWindowSize(mHandle, pos.x, pos.y);
     }
 
     void Window::CenterWindow() {
+        REQUIRE_HANDLE(void());
         GLFWmonitor* monitor = GetCurrentMonitor(mHandle);
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -644,7 +656,7 @@ namespace Core {
     {
         Image img;
 
-        if (!mHandle) return img;
+        REQUIRE_HANDLE(img);
 
         SetActive();
 
@@ -674,6 +686,7 @@ namespace Core {
 
     void Window::SetVSync(bool enabled)
     {
+        REQUIRE_HANDLE(void());
         glfwSwapInterval(enabled ? 1 : 0);
 
         mVSync = enabled;
@@ -687,11 +700,13 @@ namespace Core {
 
     void Window::SetTitle(const char* title)
     {
+        REQUIRE_HANDLE(void());
         glfwSetWindowTitle(mHandle, title);
     }
 
     void Window::SetDarkTitleBar(bool enabled)
     {
+        REQUIRE_HANDLE(void());
 #if defined(_WIN32)
         HWND hwnd = glfwGetWin32Window(mHandle);
         EnableDarkTitlebar(hwnd, enabled);
@@ -700,6 +715,7 @@ namespace Core {
 
     void Window::SetTargetFPS(double fps)
     {
+        REQUIRE_HANDLE(void());
         mTargetFPS = fps;
         mTargetFrameTime = (fps > 0.0) ? (1.0 / fps) : 0.0;
 
@@ -711,6 +727,7 @@ namespace Core {
 
     IVec2 Window::GetMousePosition()
     {
+        REQUIRE_HANDLE(IVec2(0,0));
         double x, y;
         glfwGetCursorPos(mHandle, &x, &y);
         return IVec2(x, y);
@@ -718,16 +735,19 @@ namespace Core {
 
     void Window::SetMousePosition(IVec2 pos)
     {
+        REQUIRE_HANDLE(void());
         glfwSetCursorPos(mHandle, pos.x, pos.y);
     }
 
     void Window::CenterMouse()
     {
+        REQUIRE_HANDLE(void());
         SetMousePosition(GetSize() / 2);
     }
 
     void Window::SetCursorMode(CursorMode mode)
     {
+        REQUIRE_HANDLE(void());
         mCursorMode = mode;
 
         switch (mode)

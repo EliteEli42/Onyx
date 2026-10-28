@@ -11,14 +11,14 @@ namespace Core
     static const char* LevelToString(LogLevel level) {
         switch (level)
         {
-        case LogLevel::Trace:   return "[TRACE]   ";
-        case LogLevel::Debug:   return "[DEBUG]   ";
-        case LogLevel::Info:    return "[INFO]    ";
-        case LogLevel::Warn:    return "[WARN]    ";
-        case LogLevel::Error:   return "[ERROR]   ";
-        case LogLevel::Fatal:   return "[FATAL]   ";
+        case LogLevel::Trace:   return "[TRACE]";
+        case LogLevel::Debug:   return "[DEBUG]";
+        case LogLevel::Info:    return "[INFO] ";
+        case LogLevel::Warn:    return "[WARN] ";
+        case LogLevel::Error:   return "[ERROR]";
+        case LogLevel::Fatal:   return "[FATAL]";
 
-        default:                return "[UNKNOWN] ";
+        default:                return "[UNKNOWN]";
         }
     }
 
@@ -52,7 +52,7 @@ namespace Core
         return std::string(buffer);
     }
 
-    void Log::Message(LogLevel level, const std::string& message, std::source_location location) {
+    void Log::Message(LogLevel level, std::string message, std::source_location location) {
 
         auto now = std::chrono::system_clock::now();
 
