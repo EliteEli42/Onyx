@@ -1,6 +1,8 @@
-#include <Window/Input.h>
-#include <Window/Window.h>
-#include <Window/InputCallback.h>
+#include <Core/Window/Input.h>
+#include <Core/Window/Window.h>
+#include <Core/Window/InputCallback.h>
+
+using namespace Core;
 
 InputCallback::InputCallback(Input& input)
 	:mInput(input)
@@ -12,31 +14,37 @@ void InputCallback::BindWindow(Window& window)
 {
 	window.SetKeyCallback(
 		[this](Window& window, Key key, KeyAction action) {
+			(void)window;
 			KeyCallback(key, action);
 		}
 	);
 	window.SetMouseButtonCallback(
 		[this](Window& window, MouseButton button, KeyAction action) {
+			(void)window;
 			MouseButtonCallback(button, action);
 		}
 	);
 	window.SetMouseMoveCallback(
 		[this](Window& window, IVec2 pos) {
+			(void)window;
 			MouseMoveCallback(pos);
 		}
 	);
 	window.SetScrollCallback(
 		[this](Window& window, IVec2 scroll) {
+			(void)window;
 			ScrollCallback(scroll);
 		}
 	);
 	window.SetCharCallback(
 		[this](Window& window, unsigned int codepoint) {
+			(void)window;
 			CharCallback(codepoint);
 		}
 	);
 	window.SetDropCallback(
 		[this](Window& window, int count, const char** paths) {
+			(void)window;
 			DropCallback(count, paths);
 		}
 	);

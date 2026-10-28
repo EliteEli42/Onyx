@@ -1,7 +1,10 @@
-#include "OpenGL/Image.h"
-#include "OpenGL/Texture.h"
+#include <Core/OpenGL/Image.h>
+#include <Core/OpenGL/Texture.h>
+
 #include <stb/stb_image.h>
 #include <stb/stb_image_write.h>
+
+using namespace Core;
 
 void Image::CreateSolidColor(int width, int height, int nrChannels, int layerCount, Color color)
 {
@@ -36,8 +39,6 @@ void Image::AddSolidColorLayer(Color color)
     mLayerCount++;
 
     mData.resize(layerSize * mLayerCount);
-
-    size_t layerOffset = newLayerIndex * layerSize;
 
 	FillLayer(static_cast<int>(newLayerIndex), color);
 }
@@ -182,7 +183,6 @@ bool Image::AddLayersFromFiles(const std::vector<std::string>& filepaths, bool f
 
     stbi_set_flip_vertically_on_load(flipVertically ? 1 : 0);
 
-    size_t initialLayerCount = mLayerCount;
     size_t newLayers = filepaths.size();
 
     int width = 0, height = 0, channels = 0;

@@ -1,6 +1,7 @@
 project "glm"
     kind "Utility"
     language "C++"
+    warnings "Off"
 
     files {
         "include/**"

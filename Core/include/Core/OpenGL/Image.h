@@ -1,66 +1,71 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <Core/Math/MathTypes.h>
+#include <Core/Common/MathTypes.h>
 #include <Core/OpenGL/Color.h>
 
-class Texture;
+#include <string>
+#include <vector>
 
-class Image {
-public:
-	void CreateSolidColor(int width, int height, int nrChannels, int layerCount, Color color);
-	void AddSolidColorLayer(Color color);
+namespace Core {
 
-	void CreateEmpty(int width, int height, int nrChannels);
-	bool LoadFromMemory(const unsigned char* data, int width, int height, int nrChannels, int LayerCount);
+    class Texture;
 
-	bool LoadFromFile(const std::string& filepath, bool flipVertically = false);
-	bool LoadFromFiles(const std::vector<std::string>& filepaths, bool flipVertically = false);
+    class Image {
+    public:
+        void CreateSolidColor(int width, int height, int nrChannels, int layerCount, Color color);
+        void AddSolidColorLayer(Color color);
 
-	bool AddLayerFromFile(const std::string& filepath, bool flipVertically = false);
-	bool AddLayersFromFiles(const std::vector<std::string>& filepaths, bool flipVertically = false);
+        void CreateEmpty(int width, int height, int nrChannels);
+        bool LoadFromMemory(const unsigned char* data, int width, int height, int nrChannels, int LayerCount);
 
-	bool LoadFromSpriteSheet(const std::string& filepath, int spriteWidth, int spriteHeight, bool flipVertically = false);
-	bool LoadFromSpriteSheets(const std::vector<std::string>& filepaths, int spriteWidth, int spriteHeight, bool flipVertically = false);
+        bool LoadFromFile(const std::string& filepath, bool flipVertically = false);
+        bool LoadFromFiles(const std::vector<std::string>& filepaths, bool flipVertically = false);
 
-	bool AddLayersFromSpriteSheet(const std::string& filepath, int spriteWidth, int spriteHeight, bool flipVertically = false);
-	bool AddLayersFromSpriteSheets(const std::vector<std::string>& filepaths, int spriteWidth, int spriteHeight, bool flipVertically = false);
+        bool AddLayerFromFile(const std::string& filepath, bool flipVertically = false);
+        bool AddLayersFromFiles(const std::vector<std::string>& filepaths, bool flipVertically = false);
 
-	bool SaveAs(const char* filepath, bool flipVertically = false);
+        bool LoadFromSpriteSheet(const std::string& filepath, int spriteWidth, int spriteHeight, bool flipVertically = false);
+        bool LoadFromSpriteSheets(const std::vector<std::string>& filepaths, int spriteWidth, int spriteHeight, bool flipVertically = false);
 
-	bool LoadFromTexture(const Texture& texture);
+        bool AddLayersFromSpriteSheet(const std::string& filepath, int spriteWidth, int spriteHeight, bool flipVertically = false);
+        bool AddLayersFromSpriteSheets(const std::vector<std::string>& filepaths, int spriteWidth, int spriteHeight, bool flipVertically = false);
 
-	void Unload();
-	~Image() {
-		Unload();
-	}
+        bool SaveAs(const char* filepath, bool flipVertically = false);
 
-	Color GetPixel(int x, int y, int z = 0);
-	bool SetPixel(Color color, int x, int y, int z = 0);
+        bool LoadFromTexture(const Texture& texture);
 
-	void FillLayer(int layerIndex, Color color);
+        void Unload();
+        ~Image() {
+            Unload();
+        }
 
-	const unsigned char* GetLayer(int index) const {
-		return mData.data() + index * mWidth * mHeight * mNrChannels;
-	}
-	unsigned char* GetLayer(int index) {
-		return mData.data() + index * mWidth * mHeight * mNrChannels;
-	}
+        Color GetPixel(int x, int y, int z = 0);
+        bool SetPixel(Color color, int x, int y, int z = 0);
 
-	std::vector<unsigned char>& GetData() { return mData; }
-	const std::vector<unsigned char>& GetData() const { return mData; }
-	inline int GetWidth() const { return mWidth; }
-	inline int GetHeight() const { return mHeight; }
-	inline IVec2 GetSize() const { return IVec2(mWidth, mHeight); }
-	inline int GetNrChannels() const { return mNrChannels; }
-	inline int GetLayerCount() const { return mLayerCount; }
+        void FillLayer(int layerIndex, Color color);
 
-private:
-	std::vector<unsigned char> mData;
+        const unsigned char* GetLayer(int index) const {
+            return mData.data() + index * mWidth * mHeight * mNrChannels;
+        }
+        unsigned char* GetLayer(int index) {
+            return mData.data() + index * mWidth * mHeight * mNrChannels;
+        }
 
-	int mWidth = 0;
-	int mHeight = 0;
-	int mNrChannels = 0;
-	int mLayerCount = 0;
-};
+        std::vector<unsigned char>& GetData() { return mData; }
+        const std::vector<unsigned char>& GetData() const { return mData; }
+        inline int GetWidth() const { return mWidth; }
+        inline int GetHeight() const { return mHeight; }
+        inline IVec2 GetSize() const { return IVec2(mWidth, mHeight); }
+        inline int GetNrChannels() const { return mNrChannels; }
+        inline int GetLayerCount() const { return mLayerCount; }
+
+    private:
+        std::vector<unsigned char> mData;
+
+        int mWidth = 0;
+        int mHeight = 0;
+        int mNrChannels = 0;
+        int mLayerCount = 0;
+    };
+
+} // namespace Core

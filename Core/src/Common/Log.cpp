@@ -1,4 +1,4 @@
-#include "Core/Log/Log.h"
+#include "Core/Common/Log.h"
 
 #include "ConsoleColor.h"
 

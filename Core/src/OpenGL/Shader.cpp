@@ -1,7 +1,11 @@
-#include "OpenGL/Shader.h"
+#include <Core/OpenGL/Shader.h>
+
 #include <glad/glad.h>
+
 #include <fstream>
 #include <iostream>
+
+using namespace Core;
 
 #pragma region Shader
 

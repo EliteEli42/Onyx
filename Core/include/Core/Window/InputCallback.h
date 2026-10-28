@@ -1,27 +1,31 @@
 #pragma once
 
-#include <Common/MathTypes.h>
-#include <Window/Keys.h>
+#include <Core/Common/MathTypes.h>
+#include <Core/Window/Keys.h>
 
-class Input;
-class Window;
+namespace Core {
 
-class InputCallback {
-public:
-	InputCallback(Input& input);
-	void BindWindow(Window& window);
+    class Input;
+    class Window;
 
-	void KeyCallback(Key key, KeyAction action);
-	void MouseButtonCallback(MouseButton button, KeyAction action);
-	void MouseMoveCallback(IVec2 pos);
-	void ScrollCallback(IVec2 scroll);
-	void CharCallback(unsigned int codepoint);
-	void DropCallback(int count, const char** paths);
+    class InputCallback {
+    public:
+        InputCallback(Input& input);
+        void BindWindow(Window& window);
 
-	void Update();
-	void Reset();
-	void Clear();
+        void KeyCallback(Key key, KeyAction action);
+        void MouseButtonCallback(MouseButton button, KeyAction action);
+        void MouseMoveCallback(IVec2 pos);
+        void ScrollCallback(IVec2 scroll);
+        void CharCallback(unsigned int codepoint);
+        void DropCallback(int count, const char** paths);
 
-private:
-	Input& mInput;
-};
+        void Update();
+        void Reset();
+        void Clear();
+
+    private:
+        Input& mInput;
+    };
+
+} // namespace Core

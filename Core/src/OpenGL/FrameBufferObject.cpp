@@ -1,5 +1,8 @@
-#include <OpenGL/FrameBufferObject.h>
+ï»¿#include <Core/OpenGL/FrameBufferObject.h>
+
 #include <glad/glad.h>
+
+using namespace Core;
 
 bool FrameBufferObject::Create(uint32_t width, uint32_t height, uint32_t nrChannels) {
     Destroy();
@@ -46,7 +49,7 @@ bool FrameBufferObject::Resize(uint32_t width, uint32_t height) {
     if (!mColorTex.CreateEmpty(width, height, mNrChannels))
         return false;
 
-    // FBO neu verknüpfen da Texture-ID sich geändert hat
+    // FBO neu verknÃ¼pfen da Texture-ID sich geÃ¤ndert hat
     glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mColorTex.GetID(), 0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

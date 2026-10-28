@@ -1,93 +1,97 @@
 #pragma once
 
-#include "Keys.h"
-#include <Common/MathTypes.h>
+#include <Core/Window/Keys.h>
+#include <Core/Common/MathTypes.h>
 
 #include <string>
 #include <queue>
 #include <array>
 
-class Input {
-public:
-	bool IsKeyPressed(Key key) const { return mCurrKeys[(int)key] && !mPrevKeys[(int)key]; }
-	bool IsKeyHold(Key key) const { return mCurrKeys[(int)key] && mPrevKeys[(int)key]; }
-	bool IsKeyReleased(Key key) const { return !mCurrKeys[(int)key] && mPrevKeys[(int)key]; }
+namespace Core {
 
-	bool IsMouseButtonPressed(MouseButton button) const { return mCurrMouseButtons[(int)button] && !mPrevMouseButtons[(int)button]; }
-	bool IsMouseButtonHold(MouseButton button) const { return mCurrMouseButtons[(int)button] && mPrevMouseButtons[(int)button]; }
-	bool IsMouseButtonReleased(MouseButton button) const { return !mCurrMouseButtons[(int)button] && mPrevMouseButtons[(int)button]; }
+    class Input {
+    public:
+        bool IsKeyPressed(Key key) const { return mCurrKeys[(int)key] && !mPrevKeys[(int)key]; }
+        bool IsKeyHold(Key key) const { return mCurrKeys[(int)key] && mPrevKeys[(int)key]; }
+        bool IsKeyReleased(Key key) const { return !mCurrKeys[(int)key] && mPrevKeys[(int)key]; }
 
-	IVec2 GetMousePosition() const { return mCurrMousePos; }
-	IVec2 GetMouseDelta() const { return mMouseDelta; }
+        bool IsMouseButtonPressed(MouseButton button) const { return mCurrMouseButtons[(int)button] && !mPrevMouseButtons[(int)button]; }
+        bool IsMouseButtonHold(MouseButton button) const { return mCurrMouseButtons[(int)button] && mPrevMouseButtons[(int)button]; }
+        bool IsMouseButtonReleased(MouseButton button) const { return !mCurrMouseButtons[(int)button] && mPrevMouseButtons[(int)button]; }
 
-	IVec2 GetScrollDelta() const { return mScrollDelta; }
+        IVec2 GetMousePosition() const { return mCurrMousePos; }
+        IVec2 GetMouseDelta() const { return mMouseDelta; }
 
-	unsigned int GetCharPressed() {
-		if (mCharQueue.empty()) return 0;
-		unsigned int c = mCharQueue.front();
-		mCharQueue.pop();
-		return c;
-	}
+        IVec2 GetScrollDelta() const { return mScrollDelta; }
 
-	std::string GetCharPressedUTF8() {
-		unsigned int cp = GetCharPressed();
-		if (cp == 0) return "";
-		return CodepointToUTF8(cp);
-	}
+        unsigned int GetCharPressed() {
+            if (mCharQueue.empty()) return 0;
+            unsigned int c = mCharQueue.front();
+            mCharQueue.pop();
+            return c;
+        }
 
-	char GetCharPressedASCII() {
-		unsigned int c = GetCharPressed();
-		return (c < 256) ? (char)c : 0;
-	}
+        std::string GetCharPressedUTF8() {
+            unsigned int cp = GetCharPressed();
+            if (cp == 0) return "";
+            return CodepointToUTF8(cp);
+        }
 
-	bool HasCharPressed() const { return !mCharQueue.empty(); }
-	void ClearCharQueue() { mCharQueue = std::queue<unsigned int>(); }
+        char GetCharPressedASCII() {
+            unsigned int c = GetCharPressed();
+            return (c < 256) ? (char)c : 0;
+        }
 
-	bool HasDroppedFiles() const { return !mDroppedFiles.empty(); }
-	std::string GetNextDroppedFile() {
-		if (mDroppedFiles.empty()) return {};
-		auto path = std::move(mDroppedFiles.front());
-		mDroppedFiles.pop();
-		return path;
-	}
+        bool HasCharPressed() const { return !mCharQueue.empty(); }
+        void ClearCharQueue() { mCharQueue = std::queue<unsigned int>(); }
 
-private:
-	std::array<bool, static_cast<size_t>(Key::Count)> mCurrKeys{ false };
-	std::array<bool, static_cast<size_t>(Key::Count)> mPrevKeys{ false };
-	std::array<bool, static_cast<size_t>(MouseButton::Count)> mCurrMouseButtons{ false };
-	std::array<bool, static_cast<size_t>(MouseButton::Count)> mPrevMouseButtons{ false };
+        bool HasDroppedFiles() const { return !mDroppedFiles.empty(); }
+        std::string GetNextDroppedFile() {
+            if (mDroppedFiles.empty()) return {};
+            auto path = std::move(mDroppedFiles.front());
+            mDroppedFiles.pop();
+            return path;
+        }
 
-	IVec2 mCurrMousePos = {0, 0};
-	IVec2 mPrevMousePos = { 0, 0 };
-	IVec2 mMouseDelta = {0, 0};
+    private:
+        std::array<bool, static_cast<size_t>(Key::Count)> mCurrKeys{ false };
+        std::array<bool, static_cast<size_t>(Key::Count)> mPrevKeys{ false };
+        std::array<bool, static_cast<size_t>(MouseButton::Count)> mCurrMouseButtons{ false };
+        std::array<bool, static_cast<size_t>(MouseButton::Count)> mPrevMouseButtons{ false };
 
-	IVec2 mScrollDelta = {0, 0};
+        IVec2 mCurrMousePos = { 0, 0 };
+        IVec2 mPrevMousePos = { 0, 0 };
+        IVec2 mMouseDelta = { 0, 0 };
 
-	std::queue<unsigned int> mCharQueue;
-	std::queue<std::string> mDroppedFiles;
+        IVec2 mScrollDelta = { 0, 0 };
 
-	static std::string CodepointToUTF8(unsigned int cp) {
-		std::string s;
-		if (cp < 0x80) {
-			s += (char)cp;
-		}
-		else if (cp < 0x800) {
-			s += (char)(0xC0 | (cp >> 6));
-			s += (char)(0x80 | (cp & 0x3F));
-		}
-		else if (cp < 0x10000) {
-			s += (char)(0xE0 | (cp >> 12));
-			s += (char)(0x80 | ((cp >> 6) & 0x3F));
-			s += (char)(0x80 | (cp & 0x3F));
-		}
-		else {
-			s += (char)(0xF0 | (cp >> 18));
-			s += (char)(0x80 | ((cp >> 12) & 0x3F));
-			s += (char)(0x80 | ((cp >> 6) & 0x3F));
-			s += (char)(0x80 | (cp & 0x3F));
-		}
-		return s;
-	}
+        std::queue<unsigned int> mCharQueue;
+        std::queue<std::string> mDroppedFiles;
 
-	friend class InputCallback;
-};
+        static std::string CodepointToUTF8(unsigned int cp) {
+            std::string s;
+            if (cp < 0x80) {
+                s += (char)cp;
+            }
+            else if (cp < 0x800) {
+                s += (char)(0xC0 | (cp >> 6));
+                s += (char)(0x80 | (cp & 0x3F));
+            }
+            else if (cp < 0x10000) {
+                s += (char)(0xE0 | (cp >> 12));
+                s += (char)(0x80 | ((cp >> 6) & 0x3F));
+                s += (char)(0x80 | (cp & 0x3F));
+            }
+            else {
+                s += (char)(0xF0 | (cp >> 18));
+                s += (char)(0x80 | ((cp >> 12) & 0x3F));
+                s += (char)(0x80 | ((cp >> 6) & 0x3F));
+                s += (char)(0x80 | (cp & 0x3F));
+            }
+            return s;
+        }
+
+        friend class InputCallback;
+    };
+
+} // namespace Core

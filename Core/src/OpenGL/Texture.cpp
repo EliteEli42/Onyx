@@ -1,7 +1,10 @@
-#include "OpenGL/Texture.h"
-#include "OpenGL/Image.h"
+ï»¿#include <Core/OpenGL/Texture.h>
+#include <Core/OpenGL/Image.h>
+
 #include <stb/stb_image.h>
 #include <glad/glad.h>
+
+using namespace Core;
 
 bool Texture::CreateEmpty(
     int width, int height, int nrChannels,
@@ -137,7 +140,7 @@ bool Texture::LoadFromImage(
     TextureWrap wrapT
 )
 {
-    // Übergibt einfach die Image-Daten an LoadFromMemory
+    // Ãœbergibt einfach die Image-Daten an LoadFromMemory
     return LoadFromMemory(
         image.GetData().data(),
         image.GetWidth(),
@@ -174,7 +177,7 @@ bool Texture::GetData(std::vector<unsigned char>& outData) const
         case 2: format = GL_RG; break;
         case 3: format = GL_RGB; break;
         case 4: format = GL_RGBA; break;
-        default: return false; // ungültige Kanalanzahl
+        default: return false; // ungÃ¼ltige Kanalanzahl
     }
 
     // Pixel von GPU -> CPU

@@ -1,5 +1,8 @@
-#include "OpenGL/Buffer.h"
+#include <Core/OpenGL/Buffer.h>
+
 #include <glad/glad.h>
+
+using namespace Core;
 
 #pragma region IndexBuffer
 

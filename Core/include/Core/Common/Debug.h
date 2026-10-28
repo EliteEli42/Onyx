@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/Log/Log.h>
+#include <Core/Common/Log.h>
 
 #include <cstdlib>
 #include <string>

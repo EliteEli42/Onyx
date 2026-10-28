@@ -1,6 +1,7 @@
 project "glfw"
     kind "StaticLib"
     language "C"
+    warnings "Off"
 
     files {
         "include/glfw/**.h"
@@ -52,12 +53,6 @@ project "glfw"
             "src/win32_thread.c",
             "src/win32_window.c",
             "src/wgl_context.c"
-        }
-
-        links {
-            "user32",
-            "gdi32",
-            "shell32"
         }
 
     filter "system:linux"

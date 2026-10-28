@@ -1,169 +1,175 @@
 #pragma once
-#include "Keys.h"
+
+#include <Core/OpenGL/Image.h>
+#include <Core/Common/MathTypes.h>
+#include <Core/Window/Keys.h>
+
 #include <atomic>
 #include <functional>
 
-#include <Core/OpenGL/Image.h>
-
-enum class WindowMode : uint8_t
-{
-	SystemDecorated,   // Standard OS window (titlebar + borders + DWM behavior)
-	SystemNoTitleBar,  // No titlebar, but resizable OS border still present
-	FullyUndecorated   // No OS decorations at all (borderless popup-style window)
-};
-
-class Window;
-
-struct WindowDesc
-{
-	const char* title = "Window";
-	int width = 1280;
-	int height = 720;
-	WindowMode mode = WindowMode::SystemDecorated;
-	bool centered = true;
-	bool transparent = false;
-	bool darkTitleBar = false;
-	bool resizeable = true;
-	IVec4 WindowSizeLimits = { -1,-1,-1,-1 };
-	Window* sharedContext = nullptr;
-};
-
 struct GLFWwindow;
 
-class Window {
-public:
-	Window() = default;
-	~Window();
+namespace Core {
 
-	bool Create(const WindowDesc& desc);
-	void Destroy();
+    enum class WindowMode : uint8_t
+    {
+        SystemDecorated,   // Standard OS window (titlebar + borders + DWM behavior)
+        SystemNoTitleBar,  // No titlebar, but resizable OS border still present
+        FullyUndecorated   // No OS decorations at all (borderless popup-style window)
+    };
 
-	bool IsCreated() { return mCreated; }
+    class Window;
 
-	static void PollEvents();
-	void SwapBuffers();
+    struct WindowDesc
+    {
+        const char* title = "Window";
+        int width = 1280;
+        int height = 720;
+        WindowMode mode = WindowMode::SystemDecorated;
+        bool centered = true;
+        bool transparent = false;
+        bool darkTitleBar = false;
+        bool resizeable = true;
+        IVec4 WindowSizeLimits = { -1,-1,-1,-1 };
+        Window* sharedContext = nullptr;
+    };
 
-	void RequestClose() { mShouldClose = true; }
-	bool ShouldClose() const;
+    class Window {
+    public:
+        Window() = default;
+        ~Window();
 
-	void RequestMinimize() { mRequestMinimize = true; }
-	void RequestMaximize() { mRequestMaximize = true; }
-	void RequestRestore() { mRequestRestore = true; }
+        bool Create(const WindowDesc& desc);
+        void Destroy();
 
-	void SetActive(bool active = true);
+        bool IsCreated() { return mCreated; }
 
-	void Maximize();
-	bool IsMaximized() const;
-	void Minimize();
-	void Restore();
+        static void PollEvents();
+        void SwapBuffers();
 
-	void Hide();
-	void Show();
+        void RequestClose() { mShouldClose = true; }
+        bool ShouldClose() const;
 
-	bool SetIcon(Image& image);
+        void RequestMinimize() { mRequestMinimize = true; }
+        void RequestMaximize() { mRequestMaximize = true; }
+        void RequestRestore() { mRequestRestore = true; }
 
-	void SetFullscreen(bool enabled);
-	bool IsFullscreen() const { return mIsFullscreen; }
+        void SetActive(bool active = true);
 
-	IVec2 GetPosition() const { return mPos; }
-	IVec2 GetSize() const { return mSize; }
+        void Maximize();
+        bool IsMaximized() const;
+        void Minimize();
+        void Restore();
 
-	void SetPosition(IVec2 pos);
-	void SetSize(IVec2 size);
+        void Hide();
+        void Show();
 
-	void CenterWindow();
+        bool SetIcon(Image& image);
 
-	Image GetScreenshot();
+        void SetFullscreen(bool enabled);
+        bool IsFullscreen() const { return mIsFullscreen; }
 
-	void SetVSync(bool enabled);
-	bool IsVSync() const { return mVSync; }
+        IVec2 GetPosition() const { return mPos; }
+        IVec2 GetSize() const { return mSize; }
 
-	void SetTitle(const char* title);
-	void SetDarkTitleBar(bool enabled);
+        void SetPosition(IVec2 pos);
+        void SetSize(IVec2 size);
 
-	void SetTargetFPS(double fps);
-	double GetTargetFPS() const { return mTargetFPS; }
+        void CenterWindow();
 
-	double GetDeltaTime() const { return mDeltaTime; }
-	double GetCurrentFPS() const { return mCurrentFPS; }
-	int GetSmoothFPS() const { return mSmoothedFPS; }
+        Image GetScreenshot();
 
-	GLFWwindow* GetHandle() const { return mHandle; }
+        void SetVSync(bool enabled);
+        bool IsVSync() const { return mVSync; }
 
-	void SetUserPointer(void* userPointer) { mUserPointer = userPointer; }
-	void* GetUserPointer() { return mUserPointer; }
+        void SetTitle(const char* title);
+        void SetDarkTitleBar(bool enabled);
 
-	IVec2 GetMousePosition();
-	void SetMousePosition(IVec2 pos);
-	void CenterMouse();
+        void SetTargetFPS(double fps);
+        double GetTargetFPS() const { return mTargetFPS; }
 
-	void SetCursorMode(CursorMode mode);
-	CursorMode GetCursorMode() const { return mCursorMode; }
+        double GetDeltaTime() const { return mDeltaTime; }
+        double GetCurrentFPS() const { return mCurrentFPS; }
+        int GetSmoothFPS() const { return mSmoothedFPS; }
 
-	using SizeCallback = std::function<void(Window&, IVec2)>;
-	using PositionCallback = std::function<void(Window&, IVec2)>;
-	using RefreshCallback = std::function<void(Window&)>;
-	using TitleBarHitTestCallback = std::function<bool(Window&, IVec2)>;
-	using KeyCallback = std::function<void(Window&, Key, KeyAction)>;
-	using MouseButtonCallback = std::function<void(Window&, MouseButton, KeyAction)>;
-	using MouseMoveCallback = std::function<void(Window&, IVec2)>;
-	using ScrollCallback = std::function<void(Window&, Vec2)>;
-	using CharCallback = std::function<void(Window&, uint32_t)>;
-	using DropCallback = std::function<void(Window&, int, const char**)>;
+        GLFWwindow* GetHandle() const { return mHandle; }
 
-	void SetSizeCallback(SizeCallback callback) { mSizeCallback = std::move(callback); }
-	void SetPositionCallback(SizeCallback callback) { mPositionCallback = std::move(callback); }
-	void SetRefreshCallback(RefreshCallback callback) { mRefreshCallback = std::move(callback); }
-	void SetTitleBarHitTestCallback(TitleBarHitTestCallback callback) { mTitleBarHitTestCallback = std::move(callback); }
-	void SetKeyCallback(KeyCallback callback) { mKeyCallback = std::move(callback); }
-	void SetMouseButtonCallback(MouseButtonCallback callback) { mMouseButtonCallback = std::move(callback); }
-	void SetMouseMoveCallback(MouseMoveCallback callback) { mMouseMoveCallback = std::move(callback); }
-	void SetScrollCallback(ScrollCallback callback) { mScrollCallback = std::move(callback); }
-	void SetCharCallback(CharCallback callback) { mCharCallback = std::move(callback); }
-	void SetDropCallback(DropCallback callback) { mDropCallback = std::move(callback); }
+        void SetUserPointer(void* userPointer) { mUserPointer = userPointer; }
+        void* GetUserPointer() { return mUserPointer; }
 
-private:
-	GLFWwindow* mHandle = nullptr;
-	void* mUserPointer = nullptr;
+        IVec2 GetMousePosition();
+        void SetMousePosition(IVec2 pos);
+        void CenterMouse();
 
-	SizeCallback mSizeCallback = nullptr;
-	PositionCallback mPositionCallback = nullptr;
-	RefreshCallback mRefreshCallback = nullptr;
-	TitleBarHitTestCallback mTitleBarHitTestCallback = nullptr;
-	KeyCallback mKeyCallback = nullptr;
-	MouseButtonCallback mMouseButtonCallback = nullptr;
-	MouseMoveCallback mMouseMoveCallback = nullptr;
-	ScrollCallback mScrollCallback = nullptr;
-	CharCallback mCharCallback = nullptr;
-	DropCallback mDropCallback = nullptr;
+        void SetCursorMode(CursorMode mode);
+        CursorMode GetCursorMode() const { return mCursorMode; }
 
-	double mTargetFPS = 0;
-	double mTargetFrameTime = 0;
-	double mLastFrameTime = 0.0;
+        using SizeCallback = std::function<void(Window&, IVec2)>;
+        using PositionCallback = std::function<void(Window&, IVec2)>;
+        using RefreshCallback = std::function<void(Window&)>;
+        using TitleBarHitTestCallback = std::function<bool(Window&, IVec2)>;
+        using KeyCallback = std::function<void(Window&, Key, KeyAction)>;
+        using MouseButtonCallback = std::function<void(Window&, MouseButton, KeyAction)>;
+        using MouseMoveCallback = std::function<void(Window&, IVec2)>;
+        using ScrollCallback = std::function<void(Window&, Vec2)>;
+        using CharCallback = std::function<void(Window&, uint32_t)>;
+        using DropCallback = std::function<void(Window&, int, const char**)>;
 
-	double mDeltaTime = 0.0;
-	double mCurrentFPS = 0.0;
-	int mSmoothedFPS = 0;
-	int mTitlebarHeight = 30;
+        void SetSizeCallback(SizeCallback callback) { mSizeCallback = std::move(callback); }
+        void SetPositionCallback(PositionCallback callback) { mPositionCallback = std::move(callback); }
+        void SetRefreshCallback(RefreshCallback callback) { mRefreshCallback = std::move(callback); }
+        void SetTitleBarHitTestCallback(TitleBarHitTestCallback callback) { mTitleBarHitTestCallback = std::move(callback); }
+        void SetKeyCallback(KeyCallback callback) { mKeyCallback = std::move(callback); }
+        void SetMouseButtonCallback(MouseButtonCallback callback) { mMouseButtonCallback = std::move(callback); }
+        void SetMouseMoveCallback(MouseMoveCallback callback) { mMouseMoveCallback = std::move(callback); }
+        void SetScrollCallback(ScrollCallback callback) { mScrollCallback = std::move(callback); }
+        void SetCharCallback(CharCallback callback) { mCharCallback = std::move(callback); }
+        void SetDropCallback(DropCallback callback) { mDropCallback = std::move(callback); }
 
-	IVec2 mPos = { 0, 0 };
-	IVec2 mSize = { 0, 0 };
+    private:
+        GLFWwindow* mHandle = nullptr;
+        void* mUserPointer = nullptr;
 
-	IVec2 mWindowedPos = { 100, 100 };
-	IVec2 mWindowedSize = { 1280, 720 };
+        SizeCallback mSizeCallback = nullptr;
+        PositionCallback mPositionCallback = nullptr;
+        RefreshCallback mRefreshCallback = nullptr;
+        TitleBarHitTestCallback mTitleBarHitTestCallback = nullptr;
+        KeyCallback mKeyCallback = nullptr;
+        MouseButtonCallback mMouseButtonCallback = nullptr;
+        MouseMoveCallback mMouseMoveCallback = nullptr;
+        ScrollCallback mScrollCallback = nullptr;
+        CharCallback mCharCallback = nullptr;
+        DropCallback mDropCallback = nullptr;
 
-	CursorMode mCursorMode = CursorMode::Normal;
+        double mTargetFPS = 0;
+        double mTargetFrameTime = 0;
+        double mLastFrameTime = 0.0;
 
-	bool mIsFullscreen = false;
-	bool mVSync = true;
-	bool mShouldClose = false;
-	bool mRequestMinimize = false;
-	bool mRequestMaximize = false;
-	bool mRequestRestore = false;
-	bool mTitleBarHitTestEnabled = false;
+        double mDeltaTime = 0.0;
+        double mCurrentFPS = 0.0;
+        int mSmoothedFPS = 0;
+        int mTitlebarHeight = 30;
 
-	std::atomic<bool> mCreated = false;
-	void Watchdog();
+        IVec2 mPos = { 0, 0 };
+        IVec2 mSize = { 0, 0 };
 
-	friend class WindowCallback;
-};
+        IVec2 mWindowedPos = { 100, 100 };
+        IVec2 mWindowedSize = { 1280, 720 };
+
+        CursorMode mCursorMode = CursorMode::Normal;
+
+        bool mIsFullscreen = false;
+        bool mVSync = true;
+        bool mShouldClose = false;
+        bool mRequestMinimize = false;
+        bool mRequestMaximize = false;
+        bool mRequestRestore = false;
+        bool mTitleBarHitTestEnabled = false;
+
+        std::atomic<bool> mCreated = false;
+        void Watchdog();
+
+        friend class WindowCallback;
+    };
+
+} // namespace Core

@@ -1,149 +1,153 @@
 #pragma once
 
-#include <Common/MathTypes.h>
+#include <Core/Common/MathTypes.h>
+
 #include <vector>
 #include <string>
-#include <iostream>
 
-using TextureID = uint32_t;
+namespace Core {
 
-enum class TextureFilter {
-	Nearest = 0x2600,
-	Linear = 0x2601,
-	NearestMipmapNearest = 0x2700,
-	LinearMipmapNearest = 0x2701,
-	NearestMipmapLinear = 0x2702,
-	LinearMipmapLinear = 0x2703
-};
+    using TextureID = uint32_t;
 
-enum class TextureWrap {
-	Repeat = 0x2901,
-	MirroredRepeat = 0x8370,
-	ClampToEdge = 0x812F,
-	ClampToBorder = 0x812D
-};
+    enum class TextureFilter {
+        Nearest = 0x2600,
+        Linear = 0x2601,
+        NearestMipmapNearest = 0x2700,
+        LinearMipmapNearest = 0x2701,
+        NearestMipmapLinear = 0x2702,
+        LinearMipmapLinear = 0x2703
+    };
 
-class Image;
+    enum class TextureWrap {
+        Repeat = 0x2901,
+        MirroredRepeat = 0x8370,
+        ClampToEdge = 0x812F,
+        ClampToBorder = 0x812D
+    };
 
-class Texture {
-public:
-	void Create(TextureID ID, int Width, int Height, int NrChannels, int LayerCount) {
-		mID = ID;
-		mWidth = Width;
-		mHeight = Height;
-		mNrChannels = NrChannels;
-		mLayerCount = LayerCount;
-	}
+    class Image;
 
-	bool CreateEmpty(
-		int width, int height, int nrChannels,
-		TextureFilter minFilter = TextureFilter::Linear,
-		TextureFilter magFilter = TextureFilter::Linear,
-		TextureWrap wrapS = TextureWrap::ClampToEdge,
-		TextureWrap wrapT = TextureWrap::ClampToEdge
-	);
+    class Texture {
+    public:
+        void Create(TextureID ID, int Width, int Height, int NrChannels, int LayerCount) {
+            mID = ID;
+            mWidth = Width;
+            mHeight = Height;
+            mNrChannels = NrChannels;
+            mLayerCount = LayerCount;
+        }
 
-	bool LoadFromMemory(
-		const unsigned char* data,
-		int width,
-		int height,
-		int nrChannels,
-		int LayerCount,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool CreateEmpty(
+            int width, int height, int nrChannels,
+            TextureFilter minFilter = TextureFilter::Linear,
+            TextureFilter magFilter = TextureFilter::Linear,
+            TextureWrap wrapS = TextureWrap::ClampToEdge,
+            TextureWrap wrapT = TextureWrap::ClampToEdge
+        );
 
-	bool LoadFromFile(
-		const std::string& filepath,
-		bool flipVertically = false,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool LoadFromMemory(
+            const unsigned char* data,
+            int width,
+            int height,
+            int nrChannels,
+            int LayerCount,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	bool LoadFromFiles(
-		const std::vector<std::string>& filepaths,
-		bool flipVertically = false,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool LoadFromFile(
+            const std::string& filepath,
+            bool flipVertically = false,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	bool LoadFromSpriteSheet(
-		const std::string& filepath,
-		int spriteWidth,
-		int spriteHeight,
-		bool flipVertically = false,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool LoadFromFiles(
+            const std::vector<std::string>& filepaths,
+            bool flipVertically = false,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	bool LoadFromSpriteSheets(
-		const std::vector<std::string>& filepaths,
-		int spriteWidth,
-		int spriteHeight,
-		bool flipVertically = false,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool LoadFromSpriteSheet(
+            const std::string& filepath,
+            int spriteWidth,
+            int spriteHeight,
+            bool flipVertically = false,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	bool LoadFromImage(const Image& image,
-		TextureFilter minFilter = TextureFilter::Nearest,
-		TextureFilter magFilter = TextureFilter::Nearest,
-		TextureWrap wrapS = TextureWrap::Repeat,
-		TextureWrap wrapT = TextureWrap::Repeat
-	);
+        bool LoadFromSpriteSheets(
+            const std::vector<std::string>& filepaths,
+            int spriteWidth,
+            int spriteHeight,
+            bool flipVertically = false,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	void Unload();
-	~Texture() {
-		Unload();
-	}
+        bool LoadFromImage(const Image& image,
+            TextureFilter minFilter = TextureFilter::Nearest,
+            TextureFilter magFilter = TextureFilter::Nearest,
+            TextureWrap wrapS = TextureWrap::Repeat,
+            TextureWrap wrapT = TextureWrap::Repeat
+        );
 
-	// DEFAULT-KONSTRUKTOR
-	Texture() = default;
+        void Unload();
+        ~Texture() {
+            Unload();
+        }
 
-	// COPY-KONSTRUKTOR & COPY-ASSIGNMENT (deleted)
-	Texture(const Texture&) = delete;
-	Texture& operator=(const Texture&) = delete;
+        // DEFAULT-KONSTRUKTOR
+        Texture() = default;
 
-	// MOVE-KONSTRUKTOR
-	Texture(Texture&& other) noexcept {
-		MoveFrom(std::move(other));
-	}
+        // COPY-KONSTRUKTOR & COPY-ASSIGNMENT (deleted)
+        Texture(const Texture&) = delete;
+        Texture& operator=(const Texture&) = delete;
 
-	// MOVE-ASSIGNMENT
-	Texture& operator=(Texture&& other) noexcept {
-		if (this != &other) {
-			Unload();
-			MoveFrom(std::move(other));
-		}
-		return *this;
-	}
+        // MOVE-KONSTRUKTOR
+        Texture(Texture&& other) noexcept {
+            MoveFrom(std::move(other));
+        }
 
-	void Bind(TextureID unit = 0) const;
+        // MOVE-ASSIGNMENT
+        Texture& operator=(Texture&& other) noexcept {
+            if (this != &other) {
+                Unload();
+                MoveFrom(std::move(other));
+            }
+            return *this;
+        }
 
-	bool GetData(std::vector<unsigned char>& outData) const;
-	inline TextureID GetID() const { return mID; }
-	inline int GetWidth() const { return mWidth; }
-	inline int GetHeight() const { return mHeight; }
-	inline IVec2 GetSize() const { return IVec2(mWidth, mHeight); }
-	inline int GetNrChannels() const { return mNrChannels; }
-	inline int GetLayerCount() const { return mLayerCount; }
+        void Bind(TextureID unit = 0) const;
 
-private:
-	TextureID mID = 0;
-	int mWidth = 0;
-	int mHeight = 0;
-	int mNrChannels = 0;
-	int mLayerCount = 0;
+        bool GetData(std::vector<unsigned char>& outData) const;
+        inline TextureID GetID() const { return mID; }
+        inline int GetWidth() const { return mWidth; }
+        inline int GetHeight() const { return mHeight; }
+        inline IVec2 GetSize() const { return IVec2(mWidth, mHeight); }
+        inline int GetNrChannels() const { return mNrChannels; }
+        inline int GetLayerCount() const { return mLayerCount; }
 
-	void MoveFrom(Texture&& other);
-};
+    private:
+        TextureID mID = 0;
+        int mWidth = 0;
+        int mHeight = 0;
+        int mNrChannels = 0;
+        int mLayerCount = 0;
+
+        void MoveFrom(Texture&& other);
+    };
+
+} // namespace Core
