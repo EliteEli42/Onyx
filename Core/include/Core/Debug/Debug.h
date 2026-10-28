@@ -10,21 +10,21 @@
 // --------------------------------------------------
 
 #if defined(DEBUG)
-    #if defined(_MSC_VER)
-        #include <intrin.h>
-        #define DEBUG_BREAK() __debugbreak()
+#if defined(_MSC_VER)
+#include <intrin.h>
+#define DEBUG_BREAK() __debugbreak()
 
-    #elif defined(__GNUC__) || defined(__clang__)
-        #define DEBUG_BREAK() __builtin_trap()
-
-    #else
-        #include <csignal>
-        #define DEBUG_BREAK() std::raise(SIGTRAP)
-
-    #endif
+#elif defined(__GNUC__) || defined(__clang__)
+#define DEBUG_BREAK() __builtin_trap()
 
 #else
-    #define DEBUG_BREAK() ((void)0)
+#include <csignal>
+#define DEBUG_BREAK() std::raise(SIGTRAP)
+
+#endif
+
+#else
+#define DEBUG_BREAK() ((void)0)
 
 #endif
 
@@ -34,15 +34,15 @@
 
 #if !defined(DEBUG) && defined(_WIN32)
 
-    #include <Windows.h>
+#include <Windows.h>
 
-    #define SHOW_FATAL_MESSAGE_BOX(msg)                                     \
+#define SHOW_FATAL_MESSAGE_BOX(msg)                                     \
             MessageBoxA(nullptr, (msg).c_str(), "Fatal Error",              \
                         MB_OK | MB_ICONERROR | MB_TOPMOST | MB_SETFOREGROUND)
 
 #else
 
-    #define SHOW_FATAL_MESSAGE_BOX(msg) ((void)0)
+#define SHOW_FATAL_MESSAGE_BOX(msg) ((void)0)
 
 #endif
 
@@ -52,7 +52,7 @@
 
 #if defined(DEBUG)
 
-    #define CHECK(condition, message)                                       \
+#define CHECK(condition, message)                                       \
             do                                                              \
             {                                                               \
                 if (!(condition))                                           \
@@ -65,7 +65,7 @@
 
 #else
 
-    #define CHECK(condition, message) ((void)0)
+#define CHECK(condition, message) ((void)0)
 
 #endif
 

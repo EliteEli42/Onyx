@@ -63,23 +63,17 @@ namespace Core
 
         logMessage.append(LevelToColor(level));
 
-        if (sTimeStamp)
-        {
-            logMessage.append("[");
-            logMessage.append(TimePointToString(now));
-            logMessage.append("] ");
-        }
+        logMessage.append("[");
+        logMessage.append(TimePointToString(now));
+        logMessage.append("] ");
 
         logMessage.append(LevelToString(level));
 
-        if (sSourceLocation)
-        {
-            logMessage.append("[");
-            logMessage.append(std::filesystem::path(location.file_name()).filename().string());
-            logMessage.append(":");
-            logMessage.append(std::to_string(location.line()));
-            logMessage.append("] ");
-        }
+        logMessage.append("[");
+        logMessage.append(std::filesystem::path(location.file_name()).filename().string());
+        logMessage.append(":");
+        logMessage.append(std::to_string(location.line()));
+        logMessage.append("] ");
 
         std::lock_guard<std::mutex> lock(sMutex);
 
