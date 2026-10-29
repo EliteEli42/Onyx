@@ -9,6 +9,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <functional>
 
 namespace Core
 {
@@ -19,7 +20,8 @@ namespace Core
         Info,
         Warn,
         Error,
-        Fatal
+        Fatal,
+        Off
     };
 
     struct LogEntry
@@ -103,6 +105,9 @@ namespace Core
             Message(LogLevel::Fatal, std::format(f.fmt, std::forward<Args>(args)...), f.loc);
         }
 
+        using ErrorCallback = std::function<void(LogEntry)>;
+        static void SetErrorCallback(ErrorCallback callback) { sErrorCallback = std::move(callback); }
+
     private:
         static void Message(
             LogLevel level,
@@ -112,5 +117,6 @@ namespace Core
     private:
         inline static LogLevel sCurrentLevel = LogLevel::Info;
         inline static std::mutex sMutex;
+        inline static ErrorCallback sErrorCallback = nullptr;
     };
 }
