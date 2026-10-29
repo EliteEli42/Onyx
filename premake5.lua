@@ -26,14 +26,6 @@ workspace "Onyx"
     cppdialect "C++20"
     warnings "Extra"
 
-    targetdir(path.join(
-        BuildRoot, "bin", "%{cfg.buildcfg}", "%{prj.name}"
-    ))
-
-    objdir(path.join(
-        BuildRoot, "obj", "%{cfg.buildcfg}", "%{prj.name}"
-    ))
-
     filter "system:windows"
         systemversion "latest"
         defines {
@@ -83,6 +75,16 @@ function project(name)
     else
         location(path.join(BuildRoot, "Projects", projectDir))
     end
+
+    local outputGroup = projectDir == "." and "" or projectDir
+
+    targetdir(path.join(
+        BuildRoot, "bin", "%{cfg.buildcfg}", outputGroup
+    ))
+
+    objdir(path.join(
+        BuildRoot, "obj", "%{cfg.buildcfg}", outputGroup
+    ))
 end
 
 
