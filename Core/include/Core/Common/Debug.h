@@ -34,7 +34,7 @@ namespace Core
 }
 
 #if !defined(DEBUG)
-#define SHOW_FATAL_MESSAGE_BOX(msg) ::Core::Detail::ShowFatalMessageBox(msg)
+#define SHOW_FATAL_MESSAGE_BOX(msg) ::Core::ShowFatalMessageBox(msg)
 #else
 #define SHOW_FATAL_MESSAGE_BOX(msg) ((void)0)
 #endif
